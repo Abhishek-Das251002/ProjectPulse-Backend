@@ -376,7 +376,7 @@ app.get("/report/closed-tasks/projects", verifyJWT, async (req, res) => {
         let tasksClosedByProject = {}
         if(allProjects.length !== 0){
             allProjects.map(project => {
-                tasksClosedByProject = {...tasksClosedByProject, [project.name]: completedTasks.reduce((acc, curr) => curr.project.name == project.name ? acc = acc + 1 : acc,0)}
+                tasksClosedByProject = {...tasksClosedByProject, [project.name]: completedTasks.reduce((acc, curr) => curr.project && curr.project.name == project.name ? acc = acc + 1 : acc,0)}
             })
             res.json(tasksClosedByProject)
         }else{
