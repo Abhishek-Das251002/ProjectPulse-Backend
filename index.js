@@ -112,12 +112,15 @@ app.get("/projects", verifyJWT, async (req, res) => {
 app.delete("/projects/:id", verifyJWT, async (req, res) => {
     try{
         const {id} = req.params
+    
+        await Task.deleteMany({project: id})
+        
         const delProject = await Project.findByIdAndDelete(id)
         if(delProject){
-            res.status(201).json({message: "project deleted successfully."})
+        res.status(201).json({message: "project deleted successfully."})
         }else{
             res.status(404).json({message: "project not found."})
-        }
+        }   
     }catch(error){
         res.status(500).json({message: error.message})
     }
