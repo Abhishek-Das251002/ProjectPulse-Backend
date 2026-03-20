@@ -45,6 +45,19 @@ app.post("/allUsers",async (req, res) => {
     }
 })
 
+app.get("/allUsers",verifyJWT, async (req, res) => {
+    try{
+        const validUsers = await SignUp.find()
+        if(validUsers.length !== 0){
+            res.status(200).json(validUsers)
+        }else{
+            res.status(404).json("users not found.")
+        }
+    }catch(error){
+        res.status(500).json({message: error.message})
+    }
+})
+
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
 
