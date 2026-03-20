@@ -45,18 +45,6 @@ app.post("/allUsers",async (req, res) => {
     }
 })
 
-app.get("/allUsers",verifyJWT, async (req, res) => {
-    try{
-        const validUsers = await SignUp.find()
-        if(validUsers.length !== 0){
-            res.status(200).json(validUsers)
-        }else{
-            res.status(404).json("users not found.")
-        }
-    }catch(error){
-        res.status(500).json({message: error.message})
-    }
-})
 
 const verifyJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -75,6 +63,19 @@ const verifyJWT = (req, res, next) => {
         return res.status(401).json({message: "Invalid token."})
     }
 }
+
+app.get("/allUsers",verifyJWT, async (req, res) => {
+    try{
+        const validUsers = await SignUp.find()
+        if(validUsers.length !== 0){
+            res.status(200).json(validUsers)
+        }else{
+            res.status(404).json("users not found.")
+        }
+    }catch(error){
+        res.status(500).json({message: error.message})
+    }
+})
 
 app.post("/admin/login", async (req, res) => {
     const {email} = req.body 
