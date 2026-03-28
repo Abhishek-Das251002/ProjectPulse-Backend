@@ -294,7 +294,7 @@ app.get("/tags", verifyJWT, async (req, res) => {
 
 
 
-app.get("/report/last-week", verifyJWT, async (req, res) => {
+app.get("/report/last-week", async (req, res) => {
     try{
         const completedTasks = await Task.find({status: "Completed"})
         const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -315,90 +315,62 @@ app.get("/report/last-week", verifyJWT, async (req, res) => {
         }
 
         let weekDays = {}
-        if(closedLW.length != 0){ 
-            getDays().map(day => {
-                weekDays = {...weekDays, [day]: closedLW.reduce((acc, curr) => daysOfWeek[new Date(curr.updatedAt).getDay()] === day ? acc = acc + 1 : acc,0)}
-            })
-            res.status(200).json(weekDays)
-        }else{
-            res.status(404).json({message: "tasks not found."})
-        }
+        
+        getDays().map(day => {
+            weekDays = {...weekDays, [day]: closedLW.reduce((acc, curr) => daysOfWeek[new Date(curr.updatedAt).getDay()] === day ? acc = acc + 1 : acc,0)}
+        })
+        res.status(200).json(weekDays)
+        
     }catch(error){
         res.status(500).json({message: error.message})
     }
 })
 
-app.get("/report/pending", verifyJWT, async (req, res) => {
-    try{
-        const allTasks = await Task.find()
-        const taskPending = allTasks.filter(task => task.status !== "Completed")
-        let pendingWork = {}
-        if(taskPending.length !== 0){
-            taskPending.map(task => {
-                pendingWork = {...pendingWork, [task.name]: task.timeToComplete}
-            })
 
-            res.status(200).json(pendingWork)
-        }else{
-            res.status(404).json({message: "there are no pending tasks"})
-        }
-    }catch(error){
-        res.status(500).json({message: error.message})
-    }
-})
 
-app.get("/report/closed-tasks/teams", verifyJWT, async (req, res) => {
+app.get("/report/closed-tasks/teams", async (req, res) => {
     try{
         const allTeams = await Team.find()
         const completedTasks = await Task.find({status: "Completed"}).populate("team")
 
         let tasksClosedByTeam = {}
-        if(allTeams.length !== 0){
-            allTeams.map(team => {
-                tasksClosedByTeam = {...tasksClosedByTeam, [team.name]: completedTasks.reduce((acc, curr) => curr.team.name == team.name ? acc = acc + 1 : acc,0)}
-            })
-            res.json(tasksClosedByTeam)
-        }else{
-            res.status(404).json({message: "teams not found"})
-        } 
+        
+        allTeams.map(team => {
+            tasksClosedByTeam = {...tasksClosedByTeam, [team.name]: completedTasks.reduce((acc, curr) => curr.team.name == team.name ? acc = acc + 1 : acc,0)}
+        })
+        res.json(tasksClosedByTeam)
+         
     }catch(error){
         res.status(500).json({message: error.message})
     }
 })
 
-app.get("/report/closed-tasks/owners", verifyJWT, async (req, res) => {
+app.get("/report/closed-tasks/owners", async (req, res) => {
     try{
         const allOwners = await User.find()
         const completedTasks = await Task.find({status: "Completed"}).populate("owners")
 
         let tasksClosedByOwner = {}
-        if(allOwners.length !== 0){
-            allOwners.map(owner => {
-                tasksClosedByOwner= {...tasksClosedByOwner, [owner.name]: completedTasks.reduce((acc, curr) => curr.owners.filter(taskOwner => taskOwner.name === owner.name).length !== 0 ? acc = acc + 1 :acc,0)}
-            })
-            res.json(tasksClosedByOwner)
-        }else{
-            res.status(404).json({message: "owners not found"})
-        }
+        allOwners.map(owner => {
+            tasksClosedByOwner= {...tasksClosedByOwner, [owner.name]: completedTasks.reduce((acc, curr) => curr.owners.filter(taskOwner => taskOwner.name === owner.name).length !== 0 ? acc = acc + 1 :acc,0)}
+        })
+        res.json(tasksClosedByOwner)
     }catch(error){
         res.status(500).json({message: error.message})
     }
 })
 
-app.get("/report/closed-tasks/projects", verifyJWT, async (req, res) => {
+app.get("/report/closed-tasks/projects", async (req, res) => {
     try{
         const allProjects = await Project.find()
         const completedTasks = await Task.find({status: "Completed"}).populate("project")
 
         let tasksClosedByProject = {}
-        if(allProjects.length !== 0){
-            allProjects.map(project => {
-                tasksClosedByProject = {...tasksClosedByProject, [project.name]: completedTasks.reduce((acc, curr) => curr.project && curr.project.name == project.name ? acc = acc + 1 : acc,0)}
-            })
-            res.json(tasksClosedByProject)
-        }else{
-            res.status(404).json({message: "projects not found"})
-        }
+
+        allProjects.map(project => {
+            tasksClosedByProject = {...tasksClosedByProject, [project.name]: completedTasks.reduce((acc, curr) => curr.project && curr.project.name == project.name ? acc = acc + 1 : acc,0)}
+        })
+        res.json(tasksClosedByProject)
     }catch(error){
         res.status(500).json({message: error.message})
     }
