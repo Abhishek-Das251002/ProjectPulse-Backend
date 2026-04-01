@@ -294,7 +294,7 @@ app.get("/tags", verifyJWT, async (req, res) => {
 
 
 
-app.get("/report/last-week", async (req, res) => {
+app.get("/report/last-week", verifyJWT, async (req, res) => {
     try{
         const completedTasks = await Task.find({status: "Completed"})
         const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -328,7 +328,7 @@ app.get("/report/last-week", async (req, res) => {
 
 
 
-app.get("/report/closed-tasks/teams", async (req, res) => {
+app.get("/report/closed-tasks/teams", verifyJWT, async (req, res) => {
     try{
         const allTeams = await Team.find()
         const completedTasks = await Task.find({status: "Completed"}).populate("team")
@@ -345,7 +345,7 @@ app.get("/report/closed-tasks/teams", async (req, res) => {
     }
 })
 
-app.get("/report/closed-tasks/owners", async (req, res) => {
+app.get("/report/closed-tasks/owners", verifyJWT, async (req, res) => {
     try{
         const allOwners = await User.find()
         const completedTasks = await Task.find({status: "Completed"}).populate("owners")
@@ -360,7 +360,7 @@ app.get("/report/closed-tasks/owners", async (req, res) => {
     }
 })
 
-app.get("/report/closed-tasks/projects", async (req, res) => {
+app.get("/report/closed-tasks/projects", verifyJWT, async (req, res) => {
     try{
         const allProjects = await Project.find()
         const completedTasks = await Task.find({status: "Completed"}).populate("project")
